@@ -7,8 +7,8 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNet.WebHooks
 {
@@ -197,11 +197,12 @@ namespace Microsoft.AspNet.WebHooks
             try
             {
                 // If WebHook URI contains a "NoEcho" query parameter then we don't verify the URI using a GET request
-                var parameters = webHook.WebHookUri.ParseQueryString();
+                var parameters = System.Web.HttpUtility.ParseQueryString(webHook.WebHookUri.Query);
+                
                 if (parameters[NoEchoParameter] != null)
                 {
                     var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_NoEcho);
-                    _logger.Info(message);
+                    _logger.LogInformation(message);
                     return;
                 }
 
@@ -223,14 +224,14 @@ namespace Microsoft.AspNet.WebHooks
             catch (Exception ex)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_VerifyFailure, ex.Message);
-                _logger.Error(message, ex);
+                _logger.LogError(message, ex);
                 throw new InvalidOperationException(message);
             }
 
             if (!response.IsSuccessStatusCode)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_VerifyFailure, response.StatusCode);
-                _logger.Info(message);
+                _logger.LogInformation(message);
                 throw new InvalidOperationException(message);
             }
 
@@ -238,7 +239,7 @@ namespace Microsoft.AspNet.WebHooks
             if (response.Content == null)
             {
                 var message = CustomResources.Manager_VerifyNoBody;
-                _logger.Error(message);
+                _logger.LogError(message);
                 throw new InvalidOperationException(message);
             }
 
@@ -246,7 +247,7 @@ namespace Microsoft.AspNet.WebHooks
             if (!string.Equals(actualEcho, echo, StringComparison.Ordinal))
             {
                 var message = CustomResources.Manager_VerifyBadEcho;
-                _logger.Error(message);
+                _logger.LogError(message);
                 throw new InvalidOperationException(message);
             }
         }
@@ -261,7 +262,7 @@ namespace Microsoft.AspNet.WebHooks
             if (!(webHookUri.IsHttp() || webHookUri.IsHttps()))
             {
                 var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_NoHttpUri, webHookUri);
-                _logger.Error(message);
+                _logger.LogError(message);
                 throw new InvalidOperationException(message);
             }
         }

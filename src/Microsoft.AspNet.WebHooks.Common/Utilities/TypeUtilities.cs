@@ -106,5 +106,26 @@ namespace Microsoft.AspNet.WebHooks.Utilities
             }
             return instances;
         }
+
+        /// <summary>
+        /// Finds types matching the <paramref name="predicate"/> in the assemblies in the current AppDomain
+        /// and creates instances of those type using the default constructor.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type"/> of the instances to create.</typeparam>
+        /// <param name="predicate">The predicate to apply to the search.</param>
+        /// <returns>An <see cref="ICollection{T}"/> of instances found.</returns>
+        public static ICollection<T> GetInstancesFromReferencedAssemblies<T>(Func<Type, bool> predicate)
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            ICollection<Type> types = GetTypes(assemblies, predicate);
+
+            // Create instances using default public constructor
+            List<T> instances = new List<T>();
+            foreach (Type t in types)
+            {
+                instances.Add((T)Activator.CreateInstance(t));
+            }
+            return instances;
+        }
     }
 }

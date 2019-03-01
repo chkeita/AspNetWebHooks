@@ -9,9 +9,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Storage;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 
@@ -127,7 +127,7 @@ namespace Microsoft.AspNet.WebHooks
             if (_tokenSource != null)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_Started, this.GetType().Name);
-                _logger.Error(message);
+                _logger.LogError(message);
                 throw new InvalidOperationException(message);
             }
 
@@ -187,7 +187,7 @@ namespace Microsoft.AspNet.WebHooks
                 catch (Exception ex)
                 {
                     var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_ErrorDequeueing, _queue.Name, ex.Message);
-                    _logger.Error(message, ex);
+                    _logger.LogError(message, ex);
                 }
 
                 try
@@ -196,7 +196,7 @@ namespace Microsoft.AspNet.WebHooks
                 }
                 catch (OperationCanceledException oex)
                 {
-                    _logger.Error(oex.Message, oex);
+                    _logger.LogError(oex.Message, oex);
                     return;
                 }
             }
@@ -268,7 +268,7 @@ namespace Microsoft.AspNet.WebHooks
                     catch (Exception ex)
                     {
                         var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_SendFailure, request.RequestUri, ex.Message);
-                        Logger.Info(message);
+                        Logger.LogInformation(message);
 
                         var queueMessage = GetMessage(workItem);
                         if (DiscardMessage(workItem, queueMessage))
@@ -283,7 +283,7 @@ namespace Microsoft.AspNet.WebHooks
                 {
                     var workItem = response.RequestMessage.Properties.GetValueOrDefault<WebHookWorkItem>(WorkItemKey);
                     var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_WebHookStatus, workItem.WebHook.Id, response.StatusCode, workItem.Offset);
-                    Logger.Info(message);
+                    Logger.LogInformation(message);
 
                     // If success or 'gone' HTTP status code then we remove the message from the Azure queue.
                     // If error then we leave it in the queue to be consumed once it becomes visible again or we give up
@@ -306,7 +306,7 @@ namespace Microsoft.AspNet.WebHooks
                 if (queueMessage == null)
                 {
                     var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_NoProperty, QueueMessageKey, workItem?.Id);
-                    Logger.Error(message);
+                    Logger.LogError(message);
                     throw new InvalidOperationException(message);
                 }
                 return queueMessage;
@@ -317,7 +317,7 @@ namespace Microsoft.AspNet.WebHooks
                 if (message.DequeueCount >= _parent._maxAttempts)
                 {
                     var error = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_GivingUp, workItem.WebHook.Id, message.DequeueCount);
-                    Logger.Error(error);
+                    Logger.LogError(error);
                     return true;
                 }
                 return false;

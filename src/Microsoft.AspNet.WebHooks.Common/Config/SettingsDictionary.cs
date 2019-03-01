@@ -7,6 +7,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.Serialization;
 using Microsoft.AspNet.WebHooks.Properties;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNet.WebHooks.Config
 {
@@ -72,6 +74,30 @@ namespace Microsoft.AspNet.WebHooks.Config
             {
                 base[key] = value;
             }
+        }
+
+        /// <summary>
+        /// Builds an instance of the <see cref="SettingsDictionary"/> class from the config specified in the serviceProvider
+        /// </summary>
+        /// <param name="serviceProvider">The service provider containing the configuration</param>
+        /// <returns>The instance of <see cref="SettingsDictionary"/> </returns>
+        public static SettingsDictionary ReadFromConfig(IServiceProvider serviceProvider)
+        {
+            var configuration = serviceProvider.GetService<IConfiguration>();
+
+            var settingsDictionary = new SettingsDictionary();
+
+            foreach (var appSettings in configuration.GetChildren())
+            {
+                settingsDictionary[appSettings.Key] = appSettings.Value;
+            }
+
+            foreach (var connectionSetting in configuration.GetSection("connectionStrings").GetChildren())
+            {
+                settingsDictionary.Connections.Add(connectionSetting.Key, new ConnectionSettings(connectionSetting.Key, connectionSetting.Value));
+            }
+
+            return settingsDictionary;
         }
 
         /// <summary>

@@ -7,12 +7,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
-using Microsoft.AspNet.WebHooks.Services;
 using Microsoft.AspNet.WebHooks.Storage;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Microsoft.AspNet.WebHooks
@@ -20,7 +19,6 @@ namespace Microsoft.AspNet.WebHooks
     /// <summary>
     /// Provides an implementation of <see cref="IWebHookStore"/> storing registered WebHooks in Microsoft Azure Table Storage.
     /// </summary>
-    [CLSCompliant(false)]
     public class AzureWebHookStore : WebHookStore
     {
         internal const string WebHookTable = "WebHooks";
@@ -74,39 +72,39 @@ namespace Microsoft.AspNet.WebHooks
             _protector = protector;
         }
 
-        /// <summary>
-        /// Provides a static method for creating a standalone <see cref="AzureWebHookStore"/> instance which will
-        /// encrypt the data to be stored using <see cref="IDataProtector"/>.
-        /// </summary>
-        /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
-        /// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
-        public static IWebHookStore CreateStore(ILogger logger)
-        {
-            return CreateStore(logger, encryptData: true);
-        }
+        ///// <summary>
+        ///// Provides a static method for creating a standalone <see cref="AzureWebHookStore"/> instance which will
+        ///// encrypt the data to be stored using <see cref="IDataProtector"/>.
+        ///// </summary>
+        ///// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
+        ///// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
+        //// public static IWebHookStore CreateStore(ILogger logger)
+        //// {
+        ////     return CreateStore(logger, encryptData: true);
+        //// }
 
-        /// <summary>
-        /// Provides a static method for creating a standalone <see cref="AzureWebHookStore"/> instance.
-        /// </summary>
-        /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
-        /// <param name="encryptData">Indicates whether the data should be encrypted using <see cref="IDataProtector"/> while persisted.</param>
-        /// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
-        public static IWebHookStore CreateStore(ILogger logger, bool encryptData)
-        {
-            var settings = CommonServices.GetSettings();
-            IWebHookStore store;
-            var storageManager = StorageManager.GetInstance(logger);
-            if (encryptData)
-            {
-                var protector = DataSecurity.GetDataProtector();
-                store = new AzureWebHookStore(storageManager, settings, protector, logger);
-            }
-            else
-            {
-                store = new AzureWebHookStore(storageManager, settings, logger);
-            }
-            return store;
-        }
+        ///// <summary>
+        ///// Provides a static method for creating a standalone <see cref="AzureWebHookStore"/> instance.
+        ///// </summary>
+        ///// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
+        ///// <param name="encryptData">Indicates whether the data should be encrypted using <see cref="IDataProtector"/> while persisted.</param>
+        ///// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
+        //// public static IWebHookStore CreateStore(ILogger logger, bool encryptData)
+        //// {
+        ////     var settings = CommonServices.GetSettings();
+        ////     IWebHookStore store;
+        ////     var storageManager = StorageManager.GetInstance(logger);
+        ////     if (encryptData)
+        ////     {
+        ////         var protector = DataSecurity.GetDataProtector();
+        ////         store = new AzureWebHookStore(storageManager, settings, protector, logger);
+        ////     }
+        ////     else
+        ////     {
+        ////         store = new AzureWebHookStore(storageManager, settings, logger);
+        ////     }
+        ////     return store;
+        //// }
 
         /// <inheritdoc />
         public override async Task<ICollection<WebHook>> GetAllWebHooksAsync(string user)
@@ -176,7 +174,7 @@ namespace Microsoft.AspNet.WebHooks
             if (!result.IsSuccess())
             {
                 var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_NotFound, user, id);
-                _logger.Info(message);
+                _logger.LogInformation(message);
                 return null;
             }
 
@@ -208,7 +206,7 @@ namespace Microsoft.AspNet.WebHooks
             if (result != StoreResult.Success)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_CreateFailed, table.Name, tableResult.HttpStatusCode);
-                _logger.Error(message);
+                _logger.LogError(message);
             }
             return result;
         }
@@ -237,7 +235,7 @@ namespace Microsoft.AspNet.WebHooks
             if (result != StoreResult.Success)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, table.Name, tableResult.HttpStatusCode);
-                _logger.Error(message);
+                _logger.LogError(message);
             }
             return result;
         }
@@ -270,7 +268,7 @@ namespace Microsoft.AspNet.WebHooks
             if (result != StoreResult.Success)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, table.Name, tableResult.HttpStatusCode);
-                _logger.Error(message);
+                _logger.LogError(message);
             }
             return result;
         }
@@ -361,7 +359,7 @@ namespace Microsoft.AspNet.WebHooks
             catch (Exception ex)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_BadWebHook, typeof(WebHook).Name, ex.Message);
-                _logger.Error(message, ex);
+                _logger.LogError(message, ex);
             }
             return null;
         }

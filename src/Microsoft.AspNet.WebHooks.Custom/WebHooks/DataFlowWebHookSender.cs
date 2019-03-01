@@ -10,8 +10,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNet.WebHooks
 {
@@ -90,7 +90,7 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Started, typeof(DataflowWebHookSender).Name, _launchers.Length);
-            Logger.Info(message);
+            Logger.LogInformation(message);
         }
 
         /// <inheritdoc />
@@ -147,7 +147,7 @@ namespace Microsoft.AspNet.WebHooks
                         {
                             ex = ex.GetBaseException();
                             var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_CompletionFailure, ex.Message);
-                            Logger.Error(message, ex);
+                            Logger.LogError(message, ex);
                         }
                     }
                 }
@@ -217,7 +217,7 @@ namespace Microsoft.AspNet.WebHooks
                 var response = await _httpClient.SendAsync(request);
 
                 var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Result, workItem.WebHook.Id, response.StatusCode, workItem.Offset);
-                Logger.Info(message);
+                Logger.LogInformation(message);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -235,7 +235,7 @@ namespace Microsoft.AspNet.WebHooks
             catch (Exception ex)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
-                Logger.Error(message, ex);
+                Logger.LogError(message, ex);
             }
 
             try
@@ -251,14 +251,14 @@ namespace Microsoft.AspNet.WebHooks
                 else
                 {
                     var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_GivingUp, workItem.WebHook.Id, workItem.Offset);
-                    Logger.Error(message);
+                    Logger.LogError(message);
                     await OnWebHookFailure(workItem);
                 }
             }
             catch (Exception ex)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
-                Logger.Error(message, ex);
+                Logger.LogError(message, ex);
             }
         }
     }

@@ -1,44 +1,42 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Web.Http.Dependencies;
-using Microsoft.AspNet.WebHooks.Diagnostics;
-using Microsoft.AspNet.WebHooks.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Extension methods for <see cref="IDependencyScope"/> facilitating getting the services used by custom WebHooks.
+    /// Extension methods for <see cref="IServiceProvider"/> facilitating getting the services used by custom WebHooks.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class DependencyScopeExtensions
+    public static class IServiceProviderExtensions
     {
         /// <summary>
         /// Gets an <see cref="IWebHookStore"/> implementation registered with the Dependency Injection engine
         /// or a default implementation if none are registered.
         /// </summary>
-        /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> implementation.</param>
         /// <returns>The registered <see cref="IWebHookStore"/> instance or a default implementation if none are registered.</returns>
-        public static IWebHookStore GetStore(this IDependencyScope services)
+        public static IWebHookStore GetStore(this IServiceProvider services)
         {
-            IWebHookStore store = services.GetService<IWebHookStore>();
-            return store ?? CustomServices.GetStore();
+            return services.GetRequiredService<IWebHookStore>();
         }
 
         /// <summary>
         /// Gets an <see cref="IWebHookUser"/> implementation registered with the Dependency Injection engine
         /// or a default implementation if none are registered.
         /// </summary>
-        /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> implementation.</param>
         /// <returns>The registered <see cref="IWebHookUser"/> instance or a default implementation if none are registered.</returns>
-        public static IWebHookUser GetUser(this IDependencyScope services)
+        public static IWebHookUser GetUser(this IServiceProvider services)
         {
-            IWebHookUser userId = services.GetService<IWebHookUser>();
-            return userId ?? CustomServices.GetUser();
+            return services.GetRequiredService<IWebHookUser>();
         }
 
         /// <summary>
@@ -47,14 +45,9 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> containing the registered instances.</returns>
-        public static IEnumerable<IWebHookFilterProvider> GetFilterProviders(this IDependencyScope services)
+        public static IEnumerable<IWebHookFilterProvider> GetFilterProviders(this IServiceProvider services)
         {
-            IEnumerable<IWebHookFilterProvider> filterProviders = services.GetServices<IWebHookFilterProvider>();
-            if (filterProviders == null || !filterProviders.Any())
-            {
-                filterProviders = CustomServices.GetFilterProviders();
-            }
-            return filterProviders;
+            return services.GetRequiredService<IEnumerable<IWebHookFilterProvider>>();
         }
 
         /// <summary>
@@ -63,15 +56,9 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
         /// <returns>The registered <see cref="IWebHookFilterManager"/> instance or a default implementation if none are registered.</returns>
-        public static IWebHookFilterManager GetFilterManager(this IDependencyScope services)
+        public static IWebHookFilterManager GetFilterManager(this IServiceProvider services)
         {
-            IWebHookFilterManager filterManager = services.GetService<IWebHookFilterManager>();
-            if (filterManager == null)
-            {
-                IEnumerable<IWebHookFilterProvider> filterProviders = services.GetFilterProviders();
-                filterManager = CustomServices.GetFilterManager(filterProviders);
-            }
-            return filterManager;
+            return services.GetRequiredService<IWebHookFilterManager>();
         }
 
         /// <summary>
@@ -81,15 +68,9 @@ namespace Microsoft.AspNet.WebHooks
         /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
         /// <returns>The registered <see cref="IWebHookSender"/> instance or a default implementation if none are registered.</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
-        public static IWebHookSender GetSender(this IDependencyScope services)
+        public static IWebHookSender GetSender(this IServiceProvider services)
         {
-            IWebHookSender sender = services.GetService<IWebHookSender>();
-            if (sender == null)
-            {
-                ILogger logger = services.GetLogger();
-                sender = CustomServices.GetSender(logger);
-            }
-            return sender;
+            return services.GetRequiredService<IWebHookSender>();
         }
 
         /// <summary>
@@ -99,17 +80,9 @@ namespace Microsoft.AspNet.WebHooks
         /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
         /// <returns>The registered <see cref="IWebHookManager"/> instance or a default implementation if none are registered.</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
-        public static IWebHookManager GetManager(this IDependencyScope services)
+        public static IWebHookManager GetManager(this IServiceProvider services)
         {
-            IWebHookManager manager = services.GetService<IWebHookManager>();
-            if (manager == null)
-            {
-                IWebHookStore store = services.GetStore();
-                IWebHookSender sender = services.GetSender();
-                ILogger logger = services.GetLogger();
-                manager = CustomServices.GetManager(store, sender, logger);
-            }
-            return manager;
+            return services.GetRequiredService<IWebHookManager>();
         }
 
         /// <summary>
@@ -119,18 +92,9 @@ namespace Microsoft.AspNet.WebHooks
         /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
         /// <returns>The registered <see cref="IWebHookRegistrationsManager"/> instance or a default implementation if none are registered.</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
-        public static IWebHookRegistrationsManager GetRegistrationsManager(this IDependencyScope services)
+        public static IWebHookRegistrationsManager GetRegistrationsManager(this IServiceProvider services)
         {
-            IWebHookRegistrationsManager registrationsManager = services.GetService<IWebHookRegistrationsManager>();
-            if (registrationsManager == null)
-            {
-                IWebHookManager manager = services.GetManager();
-                IWebHookStore store = services.GetStore();
-                IWebHookFilterManager filterManager = services.GetFilterManager();
-                IWebHookUser userManager = services.GetUser();
-                registrationsManager = CustomServices.GetRegistrationsManager(manager, store, filterManager, userManager);
-            }
-            return registrationsManager;
+            return services.GetRequiredService<IWebHookRegistrationsManager>();
         }
     }
 }

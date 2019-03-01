@@ -23,7 +23,6 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         /// </summary>
         /// <param name="content">The content to hash.</param>
         /// <returns>The computed hash.</returns>
-        [CLSCompliant(false)]
         public static uint GetFnvHash32(string content)
         {
             if (content == null)

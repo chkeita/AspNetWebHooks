@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace System.Web.Http
 {
@@ -13,7 +14,7 @@ namespace System.Web.Http
     /// Various extension methods for the ASP.NET Web API <see cref="ApiController"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class ApiControllerExtensions
+    public static class ControllerBaseExtensions
     {
         /// <summary>
         /// Submits a notification to all matching registered WebHooks. To match, the <see cref="WebHook"/> must be registered by the
@@ -23,7 +24,7 @@ namespace System.Web.Http
         /// <param name="action">The action describing the notification.</param>
         /// <param name="data">Optional additional data to include in the WebHook request.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static Task<int> NotifyAsync(this ApiController controller, string action, object data)
+        public static Task<int> NotifyAsync(this ControllerBase controller, string action, object data)
         {
             var notifications = new NotificationDictionary[] { new NotificationDictionary(action, data) };
             return NotifyAsync(controller, notifications, predicate: null);
@@ -40,7 +41,7 @@ namespace System.Web.Http
         /// predicate is passed the <see cref="WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
         /// the <see cref="WebHook"/> is included; otherwise it is not.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static Task<int> NotifyAsync(this ApiController controller, string action, object data, Func<WebHook, string, bool> predicate)
+        public static Task<int> NotifyAsync(this ControllerBase controller, string action, object data, Func<WebHook, string, bool> predicate)
         {
             var notifications = new NotificationDictionary[] { new NotificationDictionary(action, data) };
             return NotifyAsync(controller, notifications, predicate);
@@ -53,7 +54,7 @@ namespace System.Web.Http
         /// <param name="controller">The <see cref="ApiController"/> instance.</param>
         /// <param name="notifications">The set of notifications to include in the WebHook.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static Task<int> NotifyAsync(this ApiController controller, params NotificationDictionary[] notifications)
+        public static Task<int> NotifyAsync(this ControllerBase controller, params NotificationDictionary[] notifications)
         {
             return NotifyAsync(controller, notifications, predicate: null);
         }
@@ -68,7 +69,7 @@ namespace System.Web.Http
         /// predicate is passed the <see cref="WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
         /// the <see cref="WebHook"/> is included; otherwise it is not.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static async Task<int> NotifyAsync(this ApiController controller, IEnumerable<NotificationDictionary> notifications, Func<WebHook, string, bool> predicate)
+        public static async Task<int> NotifyAsync(this ControllerBase controller, IEnumerable<NotificationDictionary> notifications, Func<WebHook, string, bool> predicate)
         {
             if (controller == null)
             {
@@ -84,11 +85,11 @@ namespace System.Web.Http
             }
 
             // Get the User ID from the User principal
-            IWebHookUser user = controller.Configuration.DependencyResolver.GetUser();
+            IWebHookUser user = controller.HttpContext.RequestServices.GetUser();
             string userId = await user.GetUserIdAsync(controller.User);
 
             // Send a notification to registered WebHooks with matching filters
-            IWebHookManager manager = controller.Configuration.DependencyResolver.GetManager();
+            IWebHookManager manager = controller.HttpContext.RequestServices.GetManager();
             return await manager.NotifyAsync(userId, notifications, predicate);
         }
 
@@ -100,7 +101,7 @@ namespace System.Web.Http
         /// <param name="action">The action describing the notification.</param>
         /// <param name="data">Optional additional data to include in the WebHook request.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static Task<int> NotifyAllAsync(this ApiController controller, string action, object data)
+        public static Task<int> NotifyAllAsync(this ControllerBase controller, string action, object data)
         {
             var notifications = new NotificationDictionary[] { new NotificationDictionary(action, data) };
             return NotifyAllAsync(controller, notifications, predicate: null);
@@ -117,7 +118,7 @@ namespace System.Web.Http
         /// predicate is passed the <see cref="WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
         /// the <see cref="WebHook"/> is included; otherwise it is not.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static Task<int> NotifyAllAsync(this ApiController controller, string action, object data, Func<WebHook, string, bool> predicate)
+        public static Task<int> NotifyAllAsync(this ControllerBase controller, string action, object data, Func<WebHook, string, bool> predicate)
         {
             var notifications = new NotificationDictionary[] { new NotificationDictionary(action, data) };
             return NotifyAllAsync(controller, notifications, predicate);
@@ -130,7 +131,7 @@ namespace System.Web.Http
         /// <param name="controller">The <see cref="ApiController"/> instance.</param>
         /// <param name="notifications">The set of notifications to include in the WebHook.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static Task<int> NotifyAllAsync(this ApiController controller, params NotificationDictionary[] notifications)
+        public static Task<int> NotifyAllAsync(this ControllerBase controller, params NotificationDictionary[] notifications)
         {
             return NotifyAllAsync(controller, notifications, predicate: null);
         }
@@ -145,7 +146,7 @@ namespace System.Web.Http
         /// predicate is passed the <see cref="WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
         /// the <see cref="WebHook"/> is included; otherwise it is not.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static async Task<int> NotifyAllAsync(this ApiController controller, IEnumerable<NotificationDictionary> notifications, Func<WebHook, string, bool> predicate)
+        public static async Task<int> NotifyAllAsync(this ControllerBase controller, IEnumerable<NotificationDictionary> notifications, Func<WebHook, string, bool> predicate)
         {
             if (controller == null)
             {
@@ -161,7 +162,7 @@ namespace System.Web.Http
             }
 
             // Send a notification to registered WebHooks across all users with matching filters
-            IWebHookManager manager = controller.Configuration.DependencyResolver.GetManager();
+            IWebHookManager manager = controller.HttpContext.RequestServices.GetManager();
             return await manager.NotifyAllAsync(notifications, predicate);
         }
     }

@@ -9,8 +9,8 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNet.WebHooks
@@ -110,7 +110,7 @@ namespace Microsoft.AspNet.WebHooks
                     if (!request.Content.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value))
                     {
                         var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_InvalidHeader, kvp.Key, hook.Id);
-                        _logger.Error(message);
+                        _logger.LogError(message);
                     }
                 }
             }

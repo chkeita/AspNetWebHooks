@@ -5,16 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks.Config;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Microsoft.AspNet.WebHooks.Storage
 {
     /// <summary>
     /// Provides an abstraction for accessing Microsoft Azure Table Storage.
     /// </summary>
-    [CLSCompliant(false)]
     public interface IStorageManager
     {
         /// <summary>
@@ -28,7 +27,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         /// <summary>
         /// Gets a <see cref="CloudStorageAccount"/> given a <paramref name="connectionString"/>.
         /// </summary>
-        CloudStorageAccount GetCloudStorageAccount(string connectionString);
+        WindowsAzure.Storage.CloudStorageAccount GetCloudStorageAccount(string connectionString);
 
         /// <summary>
         /// Gets a <see cref="CloudTable"/> given a <paramref name="connectionString"/> and <paramref name="tableName"/>.

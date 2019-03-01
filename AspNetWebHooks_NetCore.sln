@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28705.295
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebHooks.Common", "src\Microsoft.AspNet.WebHooks.Common\Microsoft.AspNet.WebHooks.Common.csproj", "{8F217EC4-2CDD-4C2E-8113-4524DDA89A0F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebHooks.Custom", "src\Microsoft.AspNet.WebHooks.Custom\Microsoft.AspNet.WebHooks.Custom.csproj", "{E1F7823C-F8F8-4E80-B30E-9613D3C0274F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebHooks.Custom.AzureStorage", "src\Microsoft.AspNet.WebHooks.Custom.AzureStorage\Microsoft.AspNet.WebHooks.Custom.AzureStorage.csproj", "{D5BA953B-A93A-4E6E-A3D0-74535149FBD5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F217EC4-2CDD-4C2E-8113-4524DDA89A0F}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{8F217EC4-2CDD-4C2E-8113-4524DDA89A0F}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{8F217EC4-2CDD-4C2E-8113-4524DDA89A0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F217EC4-2CDD-4C2E-8113-4524DDA89A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F217EC4-2CDD-4C2E-8113-4524DDA89A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F217EC4-2CDD-4C2E-8113-4524DDA89A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1F7823C-F8F8-4E80-B30E-9613D3C0274F}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{E1F7823C-F8F8-4E80-B30E-9613D3C0274F}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{E1F7823C-F8F8-4E80-B30E-9613D3C0274F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1F7823C-F8F8-4E80-B30E-9613D3C0274F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1F7823C-F8F8-4E80-B30E-9613D3C0274F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1F7823C-F8F8-4E80-B30E-9613D3C0274F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5BA953B-A93A-4E6E-A3D0-74535149FBD5}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{D5BA953B-A93A-4E6E-A3D0-74535149FBD5}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{D5BA953B-A93A-4E6E-A3D0-74535149FBD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5BA953B-A93A-4E6E-A3D0-74535149FBD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5BA953B-A93A-4E6E-A3D0-74535149FBD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5BA953B-A93A-4E6E-A3D0-74535149FBD5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A3FF310C-7CA0-4F25-B14A-DE0E8155717C}
+	EndGlobalSection
+EndGlobal

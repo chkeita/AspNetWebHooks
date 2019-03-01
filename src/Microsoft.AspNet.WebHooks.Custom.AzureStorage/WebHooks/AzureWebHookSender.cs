@@ -7,9 +7,9 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Storage;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 
@@ -18,7 +18,6 @@ namespace Microsoft.AspNet.WebHooks
     /// <summary>
     /// Provides an implementation of <see cref="IWebHookSender"/> sending WebHooks to a Microsoft Azure Queue for later processing.
     /// </summary>
-    [CLSCompliant(false)]
     public class AzureWebHookSender : IWebHookSender
     {
         internal const string WebHookQueue = "webhooks";
@@ -74,7 +73,7 @@ namespace Microsoft.AspNet.WebHooks
             catch (Exception ex)
             {
                 var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureSender_SerializeFailure, ex.Message);
-                _logger.Error(message, ex);
+                _logger.LogError(message, ex);
                 throw new InvalidOperationException(message);
             }
 

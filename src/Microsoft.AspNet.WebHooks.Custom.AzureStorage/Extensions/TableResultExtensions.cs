@@ -3,14 +3,13 @@
 
 using System;
 using System.ComponentModel;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
 
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Extension methods for <see cref="TableResult"/>.
     /// </summary>
-    [CLSCompliant(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class TableResultExtensions
     {
