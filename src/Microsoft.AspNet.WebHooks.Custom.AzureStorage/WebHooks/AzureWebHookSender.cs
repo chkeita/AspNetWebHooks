@@ -10,7 +10,7 @@ using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Storage;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.Azure.Storage.Queue;
 using Newtonsoft.Json;
 
 namespace Microsoft.AspNet.WebHooks

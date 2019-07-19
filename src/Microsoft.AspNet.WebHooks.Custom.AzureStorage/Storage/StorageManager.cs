@@ -13,7 +13,7 @@ using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Utilities;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.Azure.Storage.Queue;
 
 namespace Microsoft.AspNet.WebHooks.Storage
 {
@@ -30,7 +30,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         private const int MaxBatchSize = 100;
 
         private static readonly ConcurrentDictionary<string, Microsoft.Azure.Cosmos.Table.CloudStorageAccount> TableAccounts = new ConcurrentDictionary<string, Microsoft.Azure.Cosmos.Table.CloudStorageAccount>();
-        private static readonly ConcurrentDictionary<string, WindowsAzure.Storage.CloudStorageAccount> QueueAccounts = new ConcurrentDictionary<string, WindowsAzure.Storage.CloudStorageAccount>();
+        private static readonly ConcurrentDictionary<string, Azure.Storage.CloudStorageAccount> QueueAccounts = new ConcurrentDictionary<string, Azure.Storage.CloudStorageAccount>();
 
         private static IStorageManager _storageManager;
 
@@ -65,15 +65,15 @@ namespace Microsoft.AspNet.WebHooks.Storage
         }
 
         /// <inheritdoc />
-        public WindowsAzure.Storage.CloudStorageAccount GetCloudStorageAccount(string connectionString)
+        public Azure.Storage.CloudStorageAccount GetCloudStorageAccount(string connectionString)
         {
-            WindowsAzure.Storage.CloudStorageAccount storageAccount;
+            Azure.Storage.CloudStorageAccount storageAccount;
             try
             {
-                storageAccount = WindowsAzure.Storage.CloudStorageAccount.Parse(connectionString);
+                storageAccount = Azure.Storage.CloudStorageAccount.Parse(connectionString);
                 if (storageAccount == null)
                 {
-                    var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_NoCloudStorageAccount, typeof(WindowsAzure.Storage.CloudStorageAccount).Name);
+                    var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_NoCloudStorageAccount, typeof(Azure.Storage.CloudStorageAccount).Name);
                     throw new ArgumentException(message);
                 }
             }
@@ -487,7 +487,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
                     string.Empty;
                 return status + errorCode;
             }
-            else if (ex is WindowsAzure.Storage.StorageException storageException && storageException.RequestInformation != null)
+            else if (ex is Azure.Storage.StorageException storageException && storageException.RequestInformation != null)
             {
                 var status = storageException.RequestInformation.HttpStatusMessage != null ?
                     storageException.RequestInformation.HttpStatusMessage + " " :
@@ -509,7 +509,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             return ex is Azure.Cosmos.Table.StorageException tse && tse.RequestInformation != null 
                     ? tse.RequestInformation.HttpStatusCode 
-                    : ex is WindowsAzure.Storage.StorageException se && se.RequestInformation != null 
+                    : ex is Azure.Storage.StorageException se && se.RequestInformation != null 
                         ? se.RequestInformation.HttpStatusCode 
                         : 500;
         }

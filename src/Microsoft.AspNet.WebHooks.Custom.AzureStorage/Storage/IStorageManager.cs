@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
 
 namespace Microsoft.AspNet.WebHooks.Storage
 {
@@ -27,7 +27,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         /// <summary>
         /// Gets a <see cref="CloudStorageAccount"/> given a <paramref name="connectionString"/>.
         /// </summary>
-        WindowsAzure.Storage.CloudStorageAccount GetCloudStorageAccount(string connectionString);
+        Azure.Storage.CloudStorageAccount GetCloudStorageAccount(string connectionString);
 
         /// <summary>
         /// Gets a <see cref="CloudTable"/> given a <paramref name="connectionString"/> and <paramref name="tableName"/>.
